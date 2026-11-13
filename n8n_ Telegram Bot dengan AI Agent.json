@@ -1,0 +1,135 @@
+{
+  "name": "n8n: Telegram Bot dengan AI Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -176,
+        -48
+      ],
+      "id": "36ce2fca-0cf0-40a0-8c3b-688f14c8e93d",
+      "name": "Telegram Trigger",
+      "webhookId": "ade769fa-3eea-4e56-9cfc-fd3525db7b0c",
+      "credentials": {
+        "telegramApi": {
+          "id": "uby1VKWmtps2rpz0",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "Kamu adalah asisten AI yang ramah dan membantu. Nama kamu adalah AI Assistant.\n\n\nTugas kamu:\n- Menjawab pertanyaan dengan jelas dan akurat\n- Menggunakan bahasa yang sopan dan mudah dipahami\n- Jika tidak tahu jawaban, katakan dengan jujur\n- Berikan penjelasan yang detail tapi tidak bertele-tele\n\nBahasa: Gunakan bahasa Indonesia kecuali user meminta bahasa lain."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        48,
+        -48
+      ],
+      "id": "e30b54fa-4f53-4d61-8c65-e6e27cef5148",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        -80,
+        160
+      ],
+      "id": "896f3ff5-e74f-41a2-b789-9810974dacb0",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VNEfUxpVkbmC8Ny9",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $('AI Agent').item.json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        416,
+        -48
+      ],
+      "id": "d89c47e1-1372-4eba-8777-288b4aeca01d",
+      "name": "Send a text message",
+      "webhookId": "00f63cd3-9280-4a16-a8eb-81cfdc7db68b",
+      "credentials": {
+        "telegramApi": {
+          "id": "uby1VKWmtps2rpz0",
+          "name": "Telegram account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "1a39d026-9a21-49bd-9ec3-e3f90674d416",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d80747973eab05fb8150f43affb227709b864661694e3bf3653c4dfe68c7c260"
+  },
+  "nodeGroups": [],
+  "id": "szqlsbcw20W93YV6",
+  "tags": []
+}
